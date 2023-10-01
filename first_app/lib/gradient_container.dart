@@ -7,11 +7,7 @@ const endAlignment = Alignment.bottomRight;
 
 // ignore: must_be_immutable
 class GradientContainer extends StatelessWidget {
-  const GradientContainer(
-    this.color1,
-    this.color2, {
-    super.key,
-  });
+  const GradientContainer(this.color1, this.color2, {super.key});
 
   const GradientContainer.purple({super.key})
       : color1 = Colors.deepPurple,
