@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 // import 'package:first_app/styled_text.dart';
 
 // ignore: must_be_immutable
@@ -26,10 +27,12 @@ class StartScreen extends StatelessWidget {
           //   ),
           // ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Learn Flutter!',
-            style: TextStyle(
-                color: Color.fromARGB(255, 255, 211, 211), fontSize: 30),
+            style: GoogleFonts.lato(
+              color: const Color.fromARGB(255, 255, 211, 211),
+              fontSize: 30,
+            ),
           ),
           const SizedBox(height: 20),
           OutlinedButton.icon(
