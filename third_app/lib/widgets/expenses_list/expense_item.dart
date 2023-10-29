@@ -15,26 +15,34 @@ class ExpenseItem extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        child: Column(children: [
-          Text(expense.title),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                // cuts string to 2 decimal places
-                '\$${expense.amount.toStringAsFixed(2)}',
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Icon(categoryIcons[expense.category]),
-                  const SizedBox(width: 8),
-                  Text(expense.formattedDate),
-                ],
-              )
-            ],
-          ),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              expense.title,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge, // styles from theme in main.dart
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  // cuts string to 2 decimal places
+                  '\$${expense.amount.toStringAsFixed(2)}',
+                ),
+                const Spacer(),
+                Row(
+                  children: [
+                    Icon(categoryIcons[expense.category]),
+                    const SizedBox(width: 8),
+                    Text(expense.formattedDate),
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

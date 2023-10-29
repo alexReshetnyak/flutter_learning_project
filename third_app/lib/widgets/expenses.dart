@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:third_app/widgets/chart/chart.dart';
 import 'package:third_app/widgets/expenses_list/expenses_list.dart';
 import 'package:third_app/models/expense.dart';
 import 'package:third_app/widgets/new_expense.dart';
@@ -11,7 +12,14 @@ class Expenses extends StatefulWidget {
 }
 
 class _ExpensesState extends State<Expenses> {
-  final List<Expense> _registeredExpanses = [];
+  final List<Expense> _registeredExpanses = [
+    Expense(
+      title: 'Pizza at work',
+      amount: 22.22,
+      date: DateTime.now(),
+      category: Category.work,
+    )
+  ];
 
   void _openAddExpenseOverlay() {
     // context is a property of State<T> class
@@ -79,7 +87,7 @@ class _ExpensesState extends State<Expenses> {
       ),
       body: Column(
         children: [
-          const Text('The Chart'),
+          Chart(expenses: _registeredExpanses),
           Expanded(
             child: mainContent,
           ),

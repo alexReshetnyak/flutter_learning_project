@@ -14,10 +14,17 @@ class ExpensesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ListView is a scrollable list of widgets arranged linearly.
     return ListView.builder(
       itemBuilder: ((context, index) {
         // Dismissible is a widget that can be dismissed by dragging in the indicated direction.
         return Dismissible(
+          background: Container(
+            color: Theme.of(context).colorScheme.error.withOpacity(0.7),
+            margin: EdgeInsets.symmetric(
+              horizontal: Theme.of(context).cardTheme.margin!.horizontal,
+            ),
+          ),
           key: ValueKey(expenses[index].id), // key is required for Dismissible
           onDismissed: (direction) {
             onRemoveExpense(expenses[index]);
