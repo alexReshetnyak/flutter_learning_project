@@ -33,6 +33,34 @@ class Chart extends StatelessWidget {
     final isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
+    final expenseChartBars = Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          for (final bucket in buckets) // alternative to map
+            ChartBar(
+              fill: bucket.totalExpenses / maxTotalExpense,
+            ),
+        ],
+      ),
+    );
+
+    final expenseIconList = buckets
+        .map(
+          (bucket) => Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Icon(
+                categoryIcons[bucket.category],
+                color: isDarkMode
+                    ? Theme.of(context).colorScheme.secondary
+                    : Theme.of(context).colorScheme.primary.withOpacity(0.7),
+              ),
+            ),
+          ),
+        )
+        .toList();
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -51,38 +79,9 @@ class Chart extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                for (final bucket in buckets) // alternative to map
-                  ChartBar(
-                    fill: bucket.totalExpenses / maxTotalExpense,
-                  ),
-              ],
-            ),
-          ),
+          expenseChartBars,
           const SizedBox(height: 12),
-          Row(
-            children: buckets
-                .map(
-                  (bucket) => Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Icon(
-                        categoryIcons[bucket.category],
-                        color: isDarkMode
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.7),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
+          Row(children: expenseIconList),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:third_app/widgets/expenses.dart';
 
 // k means global constant
@@ -12,7 +13,21 @@ var kDartColorScheme = ColorScheme.fromSeed(
 );
 
 void main() {
-  runApp(const MainApp());
+// WidgetsFlutterBinding is the glue between Flutter framework and the engine
+// ensureInitialized() is used to make sure that the binding is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // set the orientation to portrait up only
+  SystemChrome.setPreferredOrientations(
+    [
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ],
+  ).then((fn) => {
+        runApp(const MainApp()),
+      });
 }
 
 class MainApp extends StatelessWidget {
@@ -24,7 +39,7 @@ class MainApp extends StatelessWidget {
       darkTheme: ThemeData.dark().copyWith(
         useMaterial3: true,
         colorScheme: kDartColorScheme,
-        cardTheme: CardTheme().copyWith(
+        cardTheme: const CardTheme().copyWith(
           color: kDartColorScheme.secondaryContainer,
           margin: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -44,12 +59,12 @@ class MainApp extends StatelessWidget {
         // scaffoldBackgroundColor: Color.fromARGB(255, 252, 250, 223),
         colorScheme: kColorScheme,
 
-        appBarTheme: AppBarTheme().copyWith(
+        appBarTheme: const AppBarTheme().copyWith(
           backgroundColor: kColorScheme.onPrimaryContainer,
           foregroundColor: kColorScheme.primaryContainer,
         ),
 
-        cardTheme: CardTheme().copyWith(
+        cardTheme: const CardTheme().copyWith(
           color: kColorScheme.secondaryContainer,
           margin: const EdgeInsets.symmetric(
             horizontal: 16,

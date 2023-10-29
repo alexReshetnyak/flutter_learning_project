@@ -17,7 +17,7 @@ class StartScreen extends StatelessWidget {
           Image.asset(
             'assets/images/image_1.png',
             width: 300,
-            color: Color.fromARGB(117, 255, 255, 255), // 117 transparent
+            color: const Color.fromARGB(117, 255, 255, 255), // 117 transparent
           ),
           // Opacity( // Works but not performance expensive
           //   opacity: 0.7,

@@ -26,7 +26,12 @@ class _ExpensesState extends State<Expenses> {
     // open a modal bottom
     showModalBottomSheet(
         context: context,
+        useSafeArea: true,
+        // backgroundColor: Colors.transparent,
         isScrollControlled: true, // make the modal bottom sheet full screen
+        // constraints: BoxConstraints(
+        //   maxWidth: MediaQuery.of(context).size.width,
+        // ),
         builder: (ctx) {
           return NewExpense(
             onAddExpense: _addExpense,
@@ -64,6 +69,9 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    // build method is called every time the state changes or orientation changes
+    final double width = MediaQuery.of(context).size.width;
+
     Widget mainContent = const Center(
       child: Text('No expenses found. Start adding some!'),
     );
@@ -75,7 +83,26 @@ class _ExpensesState extends State<Expenses> {
       );
     }
 
+    final Widget body = width < 600
+        ? Column(
+            children: [
+              Chart(expenses: _registeredExpanses),
+              Expanded(
+                child: mainContent,
+              ),
+            ],
+          )
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Expanded is used to make the widget take the remaining space
+              Expanded(child: Chart(expenses: _registeredExpanses)),
+              Expanded(child: mainContent),
+            ],
+          );
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Flutter Expense Tracker'),
         actions: [
@@ -85,14 +112,7 @@ class _ExpensesState extends State<Expenses> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Chart(expenses: _registeredExpanses),
-          Expanded(
-            child: mainContent,
-          ),
-        ],
-      ),
+      body: body,
     );
   }
 }

@@ -8,10 +8,6 @@ class ExpenseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(
-      'TEST_TEST ${Category.work == expense.category}, ${expense.category}',
-    );
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
