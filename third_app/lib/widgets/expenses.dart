@@ -7,6 +7,14 @@ import 'package:third_app/widgets/new_expense.dart';
 class Expenses extends StatefulWidget {
   const Expenses({super.key});
 
+// * called only once when the widget is created
+  @override
+  StatefulElement createElement() {
+    print('UI update, createElement called');
+    return super.createElement();
+  }
+
+// * called every time the state changes
   @override
   State<Expenses> createState() => _ExpensesState();
 }

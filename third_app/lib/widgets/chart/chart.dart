@@ -40,6 +40,9 @@ class Chart extends StatelessWidget {
           for (final bucket in buckets) // alternative to map
             ChartBar(
               fill: bucket.totalExpenses / maxTotalExpense,
+              // * we passing key for performance
+              key: ValueKey(bucket.category),
+              // key: ObjectKey(bucket), // ValueKey is better
             ),
         ],
       ),
