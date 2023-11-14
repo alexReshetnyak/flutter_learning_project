@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:fourth_app_meals/models/category.dart';
 
 class CategoryGridItem extends StatelessWidget {
-  const CategoryGridItem({required this.category, super.key});
+  const CategoryGridItem({
+    required this.category,
+    required this.onSelectCategory,
+    super.key,
+  });
 
   final Category category;
+  final void Function() onSelectCategory;
 
   @override
   Widget build(BuildContext context) {
     // InkWell is a rectangular area of a Material that responds to touch.
     // As an alternative to InkWell, consider using GestureDetector
     return InkWell(
-      onTap: () {
-        // Navigator.of(context).pushNamed(
-        //   CategoryMealsScreen.routeName,
-        //   arguments: category,
-        // );
-      },
+      onTap: onSelectCategory,
       splashColor: Theme.of(context).primaryColor,
       borderRadius: BorderRadius.circular(16),
       child: Container(
