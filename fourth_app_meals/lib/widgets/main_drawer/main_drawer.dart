@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fourth_app_meals/wirgets/main_drawer/main_drawer_header.dart';
+import 'package:fourth_app_meals/widgets/main_drawer/main_drawer_header.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key, required this.onSelectScreen});

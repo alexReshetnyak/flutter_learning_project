@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:fourth_app_meals/screens/filters.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fourth_app_meals/providers/filters_provider.dart';
 
-class FilterVegan extends StatelessWidget {
-  const FilterVegan({
-    super.key,
-    required this.onSelectFilter,
-    required this.glutenFreeFilterSet,
-  });
-
-  final void Function(FilterOptions filterNam, bool isChecked) onSelectFilter;
-  final bool glutenFreeFilterSet;
+class FilterVegan extends ConsumerWidget {
+  const FilterVegan({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeFilters = ref.watch(filtersProvider);
+
     // SwitchListTile - is a widget that provides a nice way to create a list item with a switch
     return SwitchListTile(
-      value: glutenFreeFilterSet,
+      value: activeFilters[FilterOptions.vegan]!,
       onChanged: (isChecked) {
-        onSelectFilter(FilterOptions.vegan, isChecked);
+        ref
+            .read(filtersProvider.notifier)
+            .setFilter(FilterOptions.vegan, isChecked);
       },
       title: Text(
         'Vegan',

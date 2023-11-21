@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fourth_app_meals/screens/tabs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,7 +13,12 @@ final theme = ThemeData(
 );
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    // ProviderScope - is a widget that allows you to use providers.
+    const ProviderScope(
+      child: MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {

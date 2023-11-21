@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fourth_app_meals/models/meal.dart';
 import 'package:fourth_app_meals/screens/meal_details.dart';
-import 'package:fourth_app_meals/wirgets/meal_item/meal_item.dart';
+import 'package:fourth_app_meals/widgets/meal_item/meal_item.dart';
 
 class MealsScreen extends StatelessWidget {
   const MealsScreen({
     super.key,
     required this.meals,
-    required this.onToggleFavorite,
     this.title,
   });
 
   // ? - means that the value can be null
   final String? title;
   final List<Meal> meals;
-  final void Function(Meal) onToggleFavorite;
 
   void selectMeal(BuildContext context, Meal meal) {
     // pop - Remove the top widget of the navigator. (go back)
@@ -26,7 +24,6 @@ class MealsScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (ctx) => MealDetailsScreen(
           meal: meal,
-          onToggleFavorite: onToggleFavorite,
         ),
       ),
     );
