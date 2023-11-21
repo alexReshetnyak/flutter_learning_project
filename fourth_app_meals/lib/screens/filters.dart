@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:fourth_app_meals/screens/tabs.dart';
-import 'package:fourth_app_meals/wirgets/main_drawer/main_drawer.dart';
+import 'package:fourth_app_meals/wirgets/filters/filter_gluten.dart';
+import 'package:fourth_app_meals/wirgets/filters/filter_lactose.dart';
+import 'package:fourth_app_meals/wirgets/filters/filter_vegan.dart';
+import 'package:fourth_app_meals/wirgets/filters/filter_vegetarian.dart';
+
+enum FilterOptions {
+  glutenFree,
+  lactoseFree,
+  vegetarian,
+  vegan,
+}
 
 class FiltersScreen extends StatefulWidget {
-  const FiltersScreen({super.key});
+  const FiltersScreen({super.key, required this.currentFilters});
+
+  final Map<FilterOptions, bool> currentFilters;
 
   @override
   State<FiltersScreen> createState() {
@@ -12,7 +23,40 @@ class FiltersScreen extends StatefulWidget {
 }
 
 class _FiltersScreenState extends State<FiltersScreen> {
-  var _glutenFreeFilterSet = false;
+  bool _glutenFreeFilterSet = false;
+  bool _lactoseFreeFilterSet = false;
+  bool _vegetarianFilterSet = false;
+  bool _veganFilterSet = false;
+
+// initState - is a method that is executed before build() method
+  @override
+  void initState() {
+    super.initState();
+
+    _glutenFreeFilterSet = widget.currentFilters[FilterOptions.glutenFree]!;
+    _lactoseFreeFilterSet = widget.currentFilters[FilterOptions.lactoseFree]!;
+    _vegetarianFilterSet = widget.currentFilters[FilterOptions.vegetarian]!;
+    _veganFilterSet = widget.currentFilters[FilterOptions.vegan]!;
+  }
+
+  void onSelectFilter(FilterOptions filterName, bool isChecked) {
+    setState(() {
+      switch (filterName) {
+        case FilterOptions.glutenFree:
+          _glutenFreeFilterSet = isChecked;
+          break;
+        case FilterOptions.lactoseFree:
+          _lactoseFreeFilterSet = isChecked;
+          break;
+        case FilterOptions.vegetarian:
+          _vegetarianFilterSet = isChecked;
+          break;
+        case FilterOptions.vegan:
+          _veganFilterSet = isChecked;
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,43 +64,52 @@ class _FiltersScreenState extends State<FiltersScreen> {
       appBar: AppBar(
         title: const Text('Your Filters'),
       ),
-      drawer: MainDrawer(onSelectScreen: (identifier) {
-        Navigator.of(context).pop();
+      // drawer: MainDrawer(
+      //   onSelectScreen: (identifier) {
+      //     Navigator.of(context).pop();
 
-        if (identifier == 'meals') {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (ctx) {
-              return const TabsScreen();
-            }),
-          );
-        }
-      }),
-      body: Column(
-        children: [
-          // SwitchListTile - is a widget that provides a nice way to create a list item with a switch
-          SwitchListTile(
-            value: _glutenFreeFilterSet,
-            onChanged: (isChecked) {
-              setState(() {
-                _glutenFreeFilterSet = isChecked;
-              });
-            },
-            title: Text(
-              'Gluten-free',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
+      //     if (identifier == 'meals') {
+      //       Navigator.of(context).pushReplacement(
+      //         MaterialPageRoute(builder: (ctx) {
+      //           return const TabsScreen();
+      //         }),
+      //       );
+      //     }
+      //   },
+      // ),
+      // WillPopScope - is a widget that allows us to intercept the back button
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pop({
+            FilterOptions.glutenFree: _glutenFreeFilterSet,
+            FilterOptions.lactoseFree: _lactoseFreeFilterSet,
+            FilterOptions.vegetarian: _vegetarianFilterSet,
+            FilterOptions.vegan: _veganFilterSet,
+          });
+
+          // return false - means that we don't want to close the screen (we closed it manually with pop)
+          return false;
+        },
+        child: Column(
+          children: [
+            FilterGluten(
+              onSelectFilter: onSelectFilter,
+              glutenFreeFilterSet: _glutenFreeFilterSet,
             ),
-            subtitle: Text(
-              'Only include gluten-free meals.',
-              style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
+            FilterLactose(
+              onSelectFilter: onSelectFilter,
+              glutenFreeFilterSet: _lactoseFreeFilterSet,
             ),
-            activeColor: Theme.of(context).colorScheme.tertiary,
-            contentPadding: const EdgeInsets.only(left: 32, right: 22),
-          ),
-        ],
+            FilterVegetarian(
+              onSelectFilter: onSelectFilter,
+              glutenFreeFilterSet: _vegetarianFilterSet,
+            ),
+            FilterVegan(
+              onSelectFilter: onSelectFilter,
+              glutenFreeFilterSet: _veganFilterSet,
+            )
+          ],
+        ),
       ),
     );
   }
