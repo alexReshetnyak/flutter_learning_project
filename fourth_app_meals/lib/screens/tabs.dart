@@ -55,6 +55,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ref is global here as we used ConsumerStatefulWidget
     final availableMeals = ref.watch(filteredMealsProvider);
 
     Widget activePage = CategoriesScreen(

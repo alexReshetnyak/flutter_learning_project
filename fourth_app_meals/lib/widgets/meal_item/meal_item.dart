@@ -30,16 +30,20 @@ class MealItem extends StatelessWidget {
         child: Stack(
           // Stack - A widget that positions its children relative to the edges of its box.
           children: [
-            // FadeInImage - A widget that shows a placeholder image while the target image is loading.
-            FadeInImage(
-              // MemoryImage - Fetches an image from an Uint8List.
-              placeholder: MemoryImage(
-                kTransparentImage,
+            // Hero - A widget that marks its child as being a candidate for hero animations.
+            Hero(
+              tag: meal.id,
+              // FadeInImage - A widget that shows a placeholder image while the target image is loading.
+              child: FadeInImage(
+                // MemoryImage - Fetches an image from an Uint8List.
+                placeholder: MemoryImage(
+                  kTransparentImage,
+                ),
+                image: NetworkImage(meal.imageUrl),
+                fit: BoxFit.cover,
+                height: 200,
+                width: double.infinity,
               ),
-              image: NetworkImage(meal.imageUrl),
-              fit: BoxFit.cover,
-              height: 200,
-              width: double.infinity,
             ),
             MealItemPositioned(meal: meal)
           ],
