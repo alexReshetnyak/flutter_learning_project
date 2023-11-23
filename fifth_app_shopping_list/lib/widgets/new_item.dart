@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:fifth_app_shopping_list/data/categories.dart';
 import 'package:fifth_app_shopping_list/models/category.dart';
 import 'package:fifth_app_shopping_list/models/grocery_item.dart';
 import 'package:flutter/material.dart';
+
+// as http - prefixing the import with a prefix
+import 'package:http/http.dart' as http;
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -16,22 +21,47 @@ class _NewItemState extends State<NewItem> {
   var _enteredName = '';
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
+  var _isSending = false;
 
-  void _saveItem() {
+  void _saveItem() async {
     // .validate() - returns true if all the fields are valid
-    if (_formKey.currentState!.validate()) {
-      // .save() - calls the onSaved() method on all the form fields
-      _formKey.currentState!.save();
+    if (!_formKey.currentState!.validate()) return;
 
-      Navigator.of(context).pop(
-        GroceryItem(
-          id: DateTime.now().toString(),
-          name: _enteredName,
-          quantity: _enteredQuantity,
-          category: _selectedCategory,
-        ),
-      );
-    }
+    setState(() {
+      _isSending = true;
+    });
+
+    // .save() - calls the onSaved() method on all the form fields
+    _formKey.currentState!.save();
+
+    // Uri.https - creates a Uri object from a URI string
+    final uri = Uri.https(
+      'flutter-app-18767-default-rtdb.firebaseio.com',
+      'shopping-list.json', // can be any string with .json at the end
+    );
+
+    final response = await http.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'name': _enteredName,
+        'quantity': _enteredQuantity.toString(),
+        'category': _selectedCategory.title,
+      }),
+    );
+
+    if (!context.mounted) return;
+
+    final Map<String, dynamic> resData = json.decode(response.body);
+
+    Navigator.of(context).pop(GroceryItem(
+      id: resData['name'],
+      name: _enteredName,
+      quantity: _enteredQuantity,
+      category: _selectedCategory,
+    ));
   }
 
   @override
@@ -53,13 +83,14 @@ class _NewItemState extends State<NewItem> {
                   maxLength: 50,
                   decoration: const InputDecoration(labelText: 'Name'),
                   validator: (value) {
-                    print('TEST_TEST $value');
                     if (value == null ||
                         value.isEmpty ||
                         value.trim().length <= 1 ||
                         value.trim().length > 50) {
                       return 'Must be between 1 and 50 characters long.';
                     }
+
+                    return null;
                   },
                   onSaved: (value) {
                     _enteredName = value!;
@@ -83,6 +114,7 @@ class _NewItemState extends State<NewItem> {
                               int.tryParse(value)! <= 0) {
                             return 'Must be a number greater than 0.';
                           }
+                          return null;
                         },
                         onSaved: (value) {
                           _enteredQuantity = int.parse(value!);
@@ -127,15 +159,23 @@ class _NewItemState extends State<NewItem> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () {
-                        // .reset() - resets the form to its initial state
-                        _formKey.currentState!.reset();
-                      },
+                      onPressed: _isSending
+                          ? null // disable the button if we are sending the data
+                          : () {
+                              // .reset() - resets the form to its initial state
+                              _formKey.currentState!.reset();
+                            },
                       child: const Text('Reset'),
                     ),
                     ElevatedButton(
-                      onPressed: _saveItem,
-                      child: const Text('Add Item'),
+                      onPressed: _isSending ? null : _saveItem,
+                      child: _isSending
+                          ? const SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Text('Add Item'),
                     ),
                   ],
                 ),
