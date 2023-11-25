@@ -6,7 +6,7 @@ import 'package:sixth_app_favorite_places/screens/add_place.dart';
 import 'package:sixth_app_favorite_places/widgets/places_list.dart';
 
 class PlacesScreen extends ConsumerWidget {
-  PlacesScreen({super.key});
+  const PlacesScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,8 +28,9 @@ class PlacesScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: PlacesList(
-        places: userPlaces,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: PlacesList(places: userPlaces),
       ),
     );
   }
