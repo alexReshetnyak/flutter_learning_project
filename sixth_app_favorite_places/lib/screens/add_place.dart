@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixth_app_favorite_places/providers/user_places.dart';
 import 'package:sixth_app_favorite_places/widgets/image_input.dart';
+import 'package:sixth_app_favorite_places/widgets/location_input.dart';
 
 class AddPlaceScreeen extends ConsumerStatefulWidget {
   static const routeName = '/add-place';
@@ -20,6 +21,8 @@ class _AddPlaceScreeenState extends ConsumerState<AddPlaceScreeen> {
     final enteredTitle = _titleController.text;
 
     if (enteredTitle.isEmpty || _selectedImage == null) return;
+
+    print('TES_TEST Place selected!');
 
     ref
         .read(userPlacesProvider.notifier)
@@ -57,6 +60,8 @@ class _AddPlaceScreeenState extends ConsumerState<AddPlaceScreeen> {
                 _selectedImage = image;
               },
             ),
+            const SizedBox(height: 10),
+            const LocationInput(),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               icon: const Icon(Icons.add),
