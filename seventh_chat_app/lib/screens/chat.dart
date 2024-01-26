@@ -26,6 +26,8 @@ class _ChatScreenState extends State<ChatScreen> {
     // store this token in your server database
     final token = await fcm.getToken();
 
+    print('token: $token');
+
     fcm.subscribeToTopic('chat');
   }
 

@@ -1,12 +1,9 @@
-import 'dart:io';
+import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:seventh_chat_app/widgets/user_picker_image.dart';
-
-final _firebaseAuth = FirebaseAuth.instance;
+import 'package:seventh_chat_app/bloc/counter_bloc.dart';
+import 'package:seventh_chat_app/bloc/counter_event.dart';
+import 'package:seventh_chat_app/widgets/auth_form/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -16,83 +13,41 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool _isLogin = true;
-  String _enteredEmail = '';
-  String _enteredUsername = '';
-  String _enteredPassword = '';
-  File? _selectedImage;
-  bool _isAuthenticating = false;
+  late CounterBloc counterBloc;
+  late StreamSubscription<int> subscription;
+  int counter = 0;
 
-// form key is used to identify the form and validate it
-  final _form = GlobalKey<FormState>();
+  @override
+  void initState() {
+    counterBloc = CounterBloc();
 
-  void _submit() async {
-    final isValid = _form.currentState!.validate();
+    print(counterBloc.state); // 0
 
-    if (!isValid || _selectedImage == null && !_isLogin) {
-      return;
-    }
-
-    _form.currentState!.save();
-
-    try {
+    subscription = counterBloc.stream.listen((data) {
       setState(() {
-        _isAuthenticating = true;
+        counter = data;
       });
+    }); // 0
 
-      if (_isLogin) {
-        final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-          email: _enteredEmail,
-          password: _enteredPassword,
-        );
+    super.initState();
+  }
 
-        return;
-      }
+  @override
+  void dispose() async {
+    super.dispose();
+    await subscription.cancel();
+    counterBloc.close();
+  }
 
-      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: _enteredEmail,
-        password: _enteredPassword,
-      );
-
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('user_images') // folder will be created automatically
-          .child('${userCredential.user!.uid}.jpg');
-
-      await storageRef.putFile(_selectedImage!);
-
-      final imageUrl = await storageRef.getDownloadURL();
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'username': _enteredUsername,
-        'email': _enteredEmail,
-        'image_url': imageUrl,
-      });
-    } on FirebaseAuthException catch (e) {
-      // on catch - handles only FirebaseAuthException
-      if (e.code == 'email-already-in-use') {
-        // ...
-      }
-
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message ?? 'An error occurred!'),
-        ),
-      );
-
-      setState(() {
-        _isAuthenticating = false;
-      });
-    }
+  void _incrementCounter() async {
+    counterBloc.add(CounterIncrementPressed());
+    // await Future.delayed(Duration.zero);
+    // print(counterBloc.state); // 1
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final authScreen = Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: Center(
         child: SingleChildScrollView(
@@ -109,117 +64,47 @@ class _AuthScreenState extends State<AuthScreen> {
                 width: 200,
                 child: Image.asset('assets/images/chat.png'),
               ),
-              Card(
+              const Card(
                 margin: EdgeInsets.all(20),
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(16),
-                  child: Form(
-                    // form key is used to identify the form and validate it
-                    key: _form,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // if is used in the list of widgets to show or hide a widget
-                        if (!_isLogin)
-                          UserImagePicker(
-                            onImagePicked: (pickedImage) {
-                              _selectedImage = pickedImage;
-                            },
-                          ),
-                        TextFormField(
-                          decoration:
-                              const InputDecoration(labelText: 'Email address'),
-                          keyboardType: TextInputType.emailAddress,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
-                          validator: (value) {
-                            if (value == null ||
-                                value.trim().isEmpty ||
-                                !value.contains('@')) {
-                              return 'Please enter a valid email address.';
-                            }
-
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _enteredEmail = value!;
-                          },
-                        ),
-
-                        if (!_isLogin)
-                          TextFormField(
-                            decoration:
-                                const InputDecoration(labelText: 'Username'),
-                            enableSuggestions: false,
-                            validator: (value) {
-                              if (value == null ||
-                                  value.trim().isEmpty ||
-                                  value.trim().length < 4) {
-                                return 'Please enter at least 4 characters.';
-                              }
-
-                              return null;
-                            },
-                            onSaved: (newValue) {
-                              _enteredUsername = newValue!;
-                            },
-                          ),
-
-                        TextFormField(
-                          decoration:
-                              const InputDecoration(labelText: 'Password'),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.trim().length < 6) {
-                              return 'Password must be at least 6 characters long.';
-                            }
-
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _enteredPassword = value!;
-                          },
-                        ),
-                        const SizedBox(height: 12),
-
-                        if (_isAuthenticating)
-                          const CircularProgressIndicator(),
-
-                        if (!_isAuthenticating)
-                          ElevatedButton(
-                            onPressed: _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                            ),
-                            child: Text(
-                              _isLogin ? 'Login' : 'Sign up',
-                            ),
-                          ),
-
-                        if (!_isAuthenticating)
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _isLogin = !_isLogin;
-                              });
-                            },
-                            child: Text(
-                              _isLogin
-                                  ? 'Create an account'
-                                  : 'I already have an account',
-                            ),
-                          ),
-                      ],
+                  child: AuthForm(),
+                ),
+              ),
+              Text(counter.toString()),
+              StreamBuilder(
+                stream: counterBloc.stream,
+                builder: (context, snapshot) {
+                  return Text(
+                    '${snapshot.data}',
+                    style: const TextStyle(fontSize: 25),
+                  );
+                },
+              ),
+              OutlinedButton(
+                style: ButtonStyle(
+                  side: MaterialStateProperty.all(
+                    const BorderSide(
+                      color: Color.fromARGB(255, 250, 250, 250),
+                      width: 5,
                     ),
                   ),
                 ),
-              ),
+                onPressed: _incrementCounter,
+                child: const Text(
+                  '+',
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.red,
+                  ),
+                ),
+              )
             ],
           ),
         ),
       ),
     );
+
+    return authScreen;
   }
 }
